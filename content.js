@@ -91,15 +91,39 @@
     return fills[0]?.parentElement || null;
   }
 
+  function pageIsJapanese() {
+    const lang = document.documentElement.lang || '';
+    if (lang.toLowerCase().startsWith('ja')) return true;
+    return /月間利用量|リセットまで/.test(document.body?.textContent || '');
+  }
+
+  function allowanceText(budget, ja) {
+    const remaining = Math.abs(budget.remainingPct).toFixed(1);
+    const allowance = budget.expectedPct.toFixed(1);
+    if (ja) {
+      return budget.remainingPct < 0
+        ? `今日の許容超過: ${remaining}%（${budget.elapsedDayIndex}/30日目・許容 ${allowance}%）`
+        : `今日の残り許容: ${remaining}%（${budget.elapsedDayIndex}/30日目・許容 ${allowance}%）`;
+    }
+    return budget.remainingPct < 0
+      ? `Over today's allowance: ${remaining}% (day ${budget.elapsedDayIndex}/30 · allowance ${allowance}%)`
+      : `Remaining allowance today: ${remaining}% (day ${budget.elapsedDayIndex}/30 · allowance ${allowance}%)`;
+  }
+
+  function allowanceTitle(budget, ja) {
+    return ja
+      ? `月間の許容ライン: 30日中 ${budget.elapsedDayIndex}日目 = ${budget.expectedPct.toFixed(2)}% / 使用 ${budget.usagePercent}%`
+      : `Monthly allowance line: day ${budget.elapsedDayIndex}/30 = ${budget.expectedPct.toFixed(2)}% / used ${budget.usagePercent}%`;
+  }
+
   function ensureNote(container, resetEl, budget, usage) {
     const note = document.createElement('div');
     note.id = 'ocgo-monthly-allowance';
     const over = budget.remainingPct < 0;
+    const ja = pageIsJapanese();
     note.className = `ocgo-site-note ${over ? 'ocgo-over' : 'ocgo-healthy'}`;
-    note.textContent = over
-      ? `今日の許容超過: ${Math.abs(budget.remainingPct).toFixed(1)}%（${budget.elapsedDayIndex}/30日目・許容 ${budget.expectedPct.toFixed(1)}%）`
-      : `今日の残り許容: ${budget.remainingPct.toFixed(1)}%（${budget.elapsedDayIndex}/30日目・許容 ${budget.expectedPct.toFixed(1)}%）`;
-    note.title = `月間の許容ライン: 30日中 ${budget.elapsedDayIndex}日目 = ${budget.expectedPct.toFixed(2)}% / 使用 ${budget.usagePercent}%`;
+    note.textContent = allowanceText(budget, ja);
+    note.title = allowanceTitle(budget, ja);
 
     const old = document.getElementById('ocgo-monthly-allowance');
     if (old) old.remove();
@@ -122,7 +146,9 @@
 
     const marker = document.createElement('div');
     marker.className = 'ocgo-site-marker';
-    marker.title = `今日時点の許容利用量 ${expectedPct.toFixed(1)}%`;
+    marker.title = pageIsJapanese()
+      ? `今日時点の許容利用量 ${expectedPct.toFixed(1)}%`
+      : `Allowance as of today ${expectedPct.toFixed(1)}%`;
     marker.style.left = `${clampPct(expectedPct)}%`;
     track.appendChild(marker);
   }

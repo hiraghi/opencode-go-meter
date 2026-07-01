@@ -3,10 +3,11 @@
 [日本語](README.ja.md)
 
 A Manifest V3 Chrome extension that adds **daily-budget context** to your OpenCode Go
-plan usage. It shows rolling / weekly / monthly usage in the popup, and augments
-the native dashboard by adding **今日時点の残り許容利用量** under the monthly reset
-text plus a best-effort vertical allowance marker on the native monthly usage bar
-— for **any** opencode.ai workspace.
+plan usage. It shows Rolling Usage / Weekly Usage / Monthly Usage in the popup,
+and augments the native Monthly Usage card by adding a **Remaining allowance today**
+or **Over today's allowance** line under the site's **Resets in** text, plus a
+best-effort vertical allowance marker on the native monthly usage bar — for **any**
+opencode.ai workspace.
 
 ## Why
 
@@ -45,7 +46,7 @@ green (on/under pace) / amber / red.
 
 The monthly meter is prorated across 30 days up to today. The extension shows the usage percentage you can allow yourself as of today, then compares it with the current monthly usage.
 
-For example, if today's allowance is 3.3% and the dashboard shows 4%, the page displays a small over-allowance message under the native monthly reset text.
+For example, if today's allowance is 3.3% and the dashboard shows 4% Monthly Usage, the page displays a small `Over today's allowance` message under the native `Resets in` text.
 
 ## Notifications
 
