@@ -1,0 +1,108 @@
+/* content.css — augments the native OpenCode Go usage UI. */
+
+.ocgo-site-note {
+  margin-top: 5px;
+  font: 11px/1.25 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
+  color: rgba(128,128,128,0.95);
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+.ocgo-site-note.ocgo-healthy { color: #2e7d32; }
+.ocgo-site-note.ocgo-over { color: #d32f2f; font-weight: 600; }
+.ocgo-site-track { position: relative; }
+.ocgo-site-marker {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  transform: translateX(-1px);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.45), 0 0 4px rgba(0,0,0,0.35);
+  pointer-events: none;
+  z-index: 2;
+}
+@media (prefers-color-scheme: light) {
+  .ocgo-site-marker {
+    background: rgba(0,0,0,0.7);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.75), 0 0 4px rgba(0,0,0,0.2);
+  }
+}
+
+/* Legacy styles kept harmlessly for users who still have the old injected DOM
+   during extension reload; content.js removes #ocgo-meter on the next run. */
+#ocgo-meter {
+  margin: 8px 12px 16px 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(128,128,128,0.35);
+  border-radius: 10px;
+  background: rgba(128,128,128,0.06);
+  font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
+}
+#ocgo-meter .ocgo-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: inherit;
+}
+#ocgo-meter .ocgo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+@media (max-width: 720px) {
+  #ocgo-meter .ocgo-grid { grid-template-columns: 1fr; }
+}
+#ocgo-meter .ocgo-card {
+  border: 1px solid rgba(128,128,128,0.3);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: rgba(128,128,128,0.04);
+}
+#ocgo-meter .ocgo-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+#ocgo-meter .ocgo-pct { font-variant-numeric: tabular-nums; }
+#ocgo-meter .ocgo-track {
+  position: relative;
+  height: 9px;
+  background: rgba(128,128,128,0.25);
+  border-radius: 999px;
+  overflow: hidden;
+}
+#ocgo-meter .ocgo-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: #2e7d32;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+#ocgo-meter .ocgo-card.ocgo-warn .ocgo-fill { background: #f9a825; }
+#ocgo-meter .ocgo-card.ocgo-over .ocgo-fill { background: #e53935; }
+#ocgo-meter .ocgo-marker {
+  position: absolute;
+  top: -2px; bottom: -2px;
+  width: 2px;
+  background: rgba(127,127,127,0.9);
+}
+#ocgo-meter .ocgo-reset { color: rgba(128,128,128,0.9); font-size: 11px; margin-top: 3px; }
+#ocgo-meter .ocgo-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 11px;
+  color: rgba(128,128,128,0.95);
+  margin-top: 2px;
+}
+#ocgo-meter .ocgo-remain.ocgo-healthy { color: #2e7d32; font-weight: 600; }
+#ocgo-meter .ocgo-remain.ocgo-warn { color: #b98400; font-weight: 600; }
+#ocgo-meter .ocgo-remain.ocgo-over { color: #d32f2f; font-weight: 600; }
+#ocgo-meter .ocgo-note {
+  margin-top: 8px;
+  font-size: 10px;
+  color: rgba(128,128,128,0.8);
+  line-height: 1.3;
+}

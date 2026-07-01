@@ -1,0 +1,17 @@
+{
+  "name": "opencode-go-usage-meter",
+  "version": "0.1.1",
+  "private": true,
+  "description": "Chrome extension that adds daily-budget context to OpenCode Go usage limits.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "check": "node --check background.js && node --check content.js && node --check popup.mjs && node --check src/usage.mjs",
+    "test": "node --test test/usage.test.mjs"
+  },
+  "keywords": [
+    "chrome-extension",
+    "opencode",
+    "usage-meter"
+  ]
+}

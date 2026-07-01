@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "OpenCode Go Usage Meter",
+  "version": "0.1.1",
+  "description": "Daily-budget helper for OpenCode Go plan limits. Shows popup usage plus monthly allowance text/marker on the native dashboard.",
+  "homepage_url": "https://opencode.ai",
+  "action": {
+    "default_title": "OpenCode Go Usage",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://opencode.ai/workspace/*/go", "https://opencode.ai/workspace/*/usage"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": ["alarms", "storage", "notifications"],
+  "host_permissions": ["https://opencode.ai/*"],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/usage.mjs"],
+      "matches": ["https://opencode.ai/*"]
+    }
+  ]
+}

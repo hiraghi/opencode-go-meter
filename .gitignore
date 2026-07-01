@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.zip
+.DS_Store
+.playwright-mcp/
+*.log
+.env
+.env.*
+!.env.example
+opencode-go-meter-*.png

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenCode Go Usage</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <div class="title">OpenCode Go</div>
+    <button id="refresh" class="ghost" title="更新">↻</button>
+  </header>
+
+  <div id="status" class="status"></div>
+
+  <div id="bars" class="bars"></div>
+
+  <details id="workspace-detail" class="ws-detail">
+    <summary>ワークスペース</summary>
+    <div class="ws-row">
+      <input id="ws-input" type="text" placeholder="wrk_..." />
+      <button id="ws-save">保存</button>
+    </div>
+    <p class="hint">ワークスペースページを開くと自動検出されます。他の opencode.ai アカウントでも、そのアカウントで開いた <code>/workspace/&lt;id&gt;/go</code> が使われます。</p>
+  </details>
+
+  <footer>
+    <div id="updated"></div>
+    <div class="note">「今日あと」＝30日等のウィンドウを日割りした想定ペース上の残量。一気に使える保証ではありません。</div>
+  </footer>
+
+  <script type="module" src="popup.mjs"></script>
+</body>
+</html>
