@@ -14,6 +14,8 @@ import {
   formatResetIn,
   LIMITS,
   planUsageNotifications,
+  nextAdaptivePollMinutes,
+  ADAPTIVE_POLL_MINUTES,
 } from '../src/usage.mjs';
 
 // Real inline-script shape captured from the OpenCode Go dashboard, with all
@@ -144,4 +146,12 @@ test('planUsageNotifications: rolling thresholds are sent once until reset count
 
   const afterReset = planUsageNotifications({ lastNotif: second.lastNotif, workspaceId: 'wrk_TEST', previousWindows: { ...windows, rolling: { usagePercent: 80, resetInSec: 10 } }, windows: { ...windows, rolling: { usagePercent: 51, resetInSec: 17000 } }, now: 3 });
   assert.deepEqual(afterReset.events.filter(e => e.type === 'threshold').map(e => `${e.window}:${e.threshold}`), ['rolling:50']);
+});
+
+test('nextAdaptivePollMinutes follows rolling usage activity', () => {
+  assert.equal(nextAdaptivePollMinutes(null, { rolling: { usagePercent: 0 } }), ADAPTIVE_POLL_MINUTES.idle);
+  assert.equal(nextAdaptivePollMinutes(null, { rolling: { usagePercent: 1 } }), ADAPTIVE_POLL_MINUTES.active);
+  assert.equal(nextAdaptivePollMinutes({ rolling: { usagePercent: 1 } }, { rolling: { usagePercent: 2 } }), ADAPTIVE_POLL_MINUTES.active);
+  assert.equal(nextAdaptivePollMinutes({ rolling: { usagePercent: 2 } }, { rolling: { usagePercent: 2 } }), ADAPTIVE_POLL_MINUTES.unchanged);
+  assert.equal(nextAdaptivePollMinutes({ rolling: { usagePercent: 2 } }, { rolling: { usagePercent: 0 } }), ADAPTIVE_POLL_MINUTES.idle);
 });

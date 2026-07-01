@@ -14,6 +14,12 @@ export const FETCH_TIMEOUT_MS = 12000;
 
 export const ROLLING_THRESHOLD_WINDOWS = ['rolling', 'weekly'];
 export const USAGE_NOTIFICATION_THRESHOLDS = [50, 75, 100];
+export const ADAPTIVE_POLL_MINUTES = {
+  idle: 60,
+  active: 5,
+  unchanged: 30,
+  fallback: 30,
+};
 
 /** Extract the workspace id from a /workspace/<id>/... URL. Returns null if not found. */
 export function workspaceIdFromUrl(url) {
@@ -213,6 +219,28 @@ function notificationWorkspaceBucket(lastNotif, workspaceId) {
 function resetAdvanced(previousWindow, currentWindow, toleranceSec = 60) {
   if (!previousWindow || !currentWindow) return false;
   return currentWindow.resetInSec > previousWindow.resetInSec + toleranceSec;
+}
+
+/**
+ * Plan the next background poll from only the 5h rolling usage window.
+ *
+ * Rules:
+ * - rolling usage is 0%: the user is probably idle or the 5h window reset -> 1h
+ * - rolling usage increased since the previous successful poll: user is active -> 5m
+ * - rolling usage did not increase: keep a lighter watch -> 30m
+ *
+ * The first non-zero reading is treated as active so usage started between polls
+ * quickly tightens the interval after it is detected.
+ */
+export function nextAdaptivePollMinutes(previousWindows, windows) {
+  const current = windows?.rolling?.usagePercent;
+  if (!Number.isFinite(current)) return ADAPTIVE_POLL_MINUTES.fallback;
+  if (current <= 0) return ADAPTIVE_POLL_MINUTES.idle;
+
+  const previous = previousWindows?.rolling?.usagePercent;
+  if (!Number.isFinite(previous)) return ADAPTIVE_POLL_MINUTES.active;
+  if (current > previous) return ADAPTIVE_POLL_MINUTES.active;
+  return ADAPTIVE_POLL_MINUTES.unchanged;
 }
 
 /**

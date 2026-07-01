@@ -50,9 +50,7 @@ For example, if today's allowance is 3.3% and the dashboard shows 4% Monthly Usa
 
 ## Notifications
 
-The background service worker polls on install/startup, every 5 minutes while
-Chrome is running, when a workspace tab finishes loading, and when the popup
-requests a manual refresh.
+The background service worker polls while Chrome is running, when a workspace tab finishes loading, and when the popup requests a manual refresh. The regular background interval is adaptive based on 5h Rolling Usage: 1 hour at 0%, 5 minutes after usage increases, and 30 minutes when usage is unchanged.
 
 Notifications are emitted for:
 - monthly usage above today's prorated allowance: at most once per local date;

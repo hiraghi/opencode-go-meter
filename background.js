@@ -13,10 +13,11 @@ import {
   severityForPace,
   formatResetIn,
   planUsageNotifications,
+  nextAdaptivePollMinutes,
+  ADAPTIVE_POLL_MINUTES,
 } from './src/usage.mjs';
 
 const ALARM_NAME = 'go-poll';
-const POLL_PERIOD_MIN = 5;          // 5 minutes — well above the 0.5m MV3 floor
 const STORAGE_KEY = 'state';
 const NOTIF_AUTH = 'go-auth-expired';
 // Chrome notifications require iconUrl. The toolbar/manifest icon files were
@@ -34,6 +35,10 @@ async function setState(patch) {
   const next = { ...cur, ...patch };
   await chrome.storage.local.set({ [STORAGE_KEY]: next });
   return next;
+}
+
+async function scheduleNextPoll(delayInMinutes) {
+  await chrome.alarms.create(ALARM_NAME, { delayInMinutes });
 }
 
 /** Discover the workspace id from the currently-open opencode.ai tab if any. */
@@ -130,6 +135,7 @@ async function doPoll() {
     // No workspace configured and none visible. Clear the badge.
     await chrome.action.setBadgeText({ text: '' });
     await chrome.action.setTitle({ title: 'OpenCode Go Usage — opencode.ai の /workspace ページを開いてください' });
+    await scheduleNextPoll(ADAPTIVE_POLL_MINUTES.idle);
     return;
   }
 
@@ -146,6 +152,7 @@ async function doPoll() {
       await chrome.action.setTitle({ title: `OpenCode Go Usage — 取得失敗: ${res.error || res.status}` });
     }
     await setState({ last: { at: Date.now(), ok: false, error: res.error || res.status, authRequired: !!res.authRequired } });
+    await scheduleNextPoll(res.authRequired ? ADAPTIVE_POLL_MINUTES.idle : ADAPTIVE_POLL_MINUTES.fallback);
     return;
   }
 
@@ -155,6 +162,7 @@ async function doPoll() {
     await chrome.action.setBadgeBackgroundColor({ color: '#777' });
     await chrome.action.setTitle({ title: 'OpenCode Go Usage — データ解析失敗(フォーマット変更?)' });
     await setState({ last: { at: Date.now(), ok: false, error: parsed.error } });
+    await scheduleNextPoll(ADAPTIVE_POLL_MINUTES.fallback);
     return;
   }
 
@@ -167,10 +175,13 @@ async function doPoll() {
     windows,
     now,
   });
+  const nextPollMin = nextAdaptivePollMinutes(state.last?.windows, windows);
   await updateBadge(windows.monthly);
   await setState({
     workspaceId,
     lastNotif: planned.lastNotif,
+    nextPollMin,
+    nextPollAt: now + nextPollMin * 60 * 1000,
     last: {
       at: now,
       ok: true,
@@ -178,18 +189,17 @@ async function doPoll() {
       finalUrl: res.finalUrl,
     },
   });
+  await scheduleNextPoll(nextPollMin);
   await emitUsageNotifications(planned.events);
 }
 
 // --- lifecycle ---
 
 chrome.runtime.onInstalled.addListener(async () => {
-  await chrome.alarms.create(ALARM_NAME, { periodInMinutes: POLL_PERIOD_MIN });
   await poll();
 });
 
 chrome.runtime.onStartup?.addListener(() => {
-  chrome.alarms.create(ALARM_NAME, { periodInMinutes: POLL_PERIOD_MIN });
   // Return the promise so the runtime keeps the worker alive for the fetch+parse.
   return poll();
 });
